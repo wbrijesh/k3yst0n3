@@ -1,0 +1,2 @@
+development:
+	docker compose up
