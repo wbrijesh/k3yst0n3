@@ -1,8 +1,24 @@
 services:
+  postgres:
+    image: postgres:latest
+    environment:
+      - POSTGRES_DB=keystone_db
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_volume:/var/lib/postgresql/data
   minio:
-    hostname: minio
     image: quay.io/minio/minio:latest
     command: server --console-address ":9001" /data
+    restart: always
     ports:
       - "9000:9000"
       - "9001:9001"
@@ -11,19 +27,21 @@ services:
       - "9001"
     healthcheck:
       test: ["CMD", "mc", "ready", "local"]
-      interval: 5s
+      interval: 30s
       timeout: 5s
       retries: 5
     volumes:
-      - data-1:/data
+      - minio_volume:/data
   k3yst0n3:
     hostname: k3yst0n3
     build: .
     depends_on:
+      - postgres
       - minio
     ports:
       - 4000:4000
 
 volumes:
-  data-1:
+  postgres_volume:
+  minio_volume:
 

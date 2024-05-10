@@ -13,7 +13,7 @@ RUN go mod download
 COPY . .
 
 # Build the Go app
-RUN go build -o main .
+RUN go build -o main server/main.go
 
 # Expose port 4000 to the outside world
 EXPOSE 4000
