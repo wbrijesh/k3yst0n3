@@ -1,15 +1,17 @@
 package main
 
 import (
-	"k3yst0n3/handlers"
+	"k3yst0n3/database"
 
 	"github.com/labstack/echo/v4"
 )
 
 func main() {
+	database.ConnectDb()
+
 	e := echo.New()
 
-	e.GET("/health", handlers.HealthCHeckHandler)
+	setupRoutes(e)
 
 	e.Logger.Fatal(e.Start(":4000"))
 }

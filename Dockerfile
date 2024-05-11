@@ -1,23 +1,8 @@
 FROM golang:latest
 
-# Set the current working directory inside the container
-WORKDIR /app
+WORKDIR /usr/src/app
 
-# Copy go.mod and go.sum files to the workspace
-COPY go.mod go.sum ./
+RUN go install github.com/cosmtrek/air@latest
 
-# Download all dependencies
-RUN go mod download
-
-# Copy the source from the current directory to the workspace
 COPY . .
-
-# Build the Go app
-RUN go build -o main server/main.go
-
-# Expose port 4000 to the outside world
-EXPOSE 4000
-
-# Run the app
-ENTRYPOINT ["./main"]
-
+RUN go mod tidy
