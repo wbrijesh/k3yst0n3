@@ -2,6 +2,7 @@ package database
 
 import (
 	"fmt"
+	"k3yst0n3/helpers"
 	"k3yst0n3/models"
 	"log"
 	"os"
@@ -11,19 +12,19 @@ import (
 	"gorm.io/gorm/logger"
 )
 
-type Dbinstance struct {
-	Db *gorm.DB
+type DbinstanceType struct {
+	DB *gorm.DB
 }
 
-var DB Dbinstance
+var DBInstance DbinstanceType
 
 func ConnectDb() {
 	dsn := fmt.Sprintf(
-		"host=postgres user=%s password=%s dbname=%s port=5432 sslmode=disable TimeZone=Asia/Shanghai",
-		"test", "test", "test",
-		// os.Getenv("DB_USER"),
-		// os.Getenv("DB_PASSWORD"),
-		// os.Getenv("DB_NAME"),
+		// "host=postgres user=%s password=%s dbname=%s port=5432 sslmode=disable TimeZone=Asia/Shanghai",
+		"host=postgres user=%s password=%s dbname=%s port=5432 sslmode=disable TimeZone=UTC",
+		helpers.GetEnv("POSTGRES_USER"),
+		helpers.GetEnv("POSTGRES_PASSWORD"),
+		helpers.GetEnv("POSTGRES_DB"),
 	)
 
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
@@ -38,9 +39,11 @@ func ConnectDb() {
 	db.Logger = logger.Default.LogMode(logger.Info)
 
 	log.Println("running migrations")
-	db.AutoMigrate(&models.Fact{})
+	db.AutoMigrate(&models.User{})
+	db.AutoMigrate(&models.Application{})
+	db.AutoMigrate(&models.Event{})
 
-	DB = Dbinstance{
-		Db: db,
+	DBInstance = DbinstanceType{
+		DB: db,
 	}
 }
