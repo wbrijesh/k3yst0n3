@@ -1,12 +1,6 @@
 services:
-  server:
-    build: .
-    ports:
-      - "4000:4000"
-    volumes:
-      - .:/usr/src/app
-    command: air ./cmd/main.go -b 0.0.0.0
   minio:
+    container_name: minio
     image: quay.io/minio/minio:latest
     command: server --console-address ":9001" /data
     restart: always
@@ -19,6 +13,7 @@ services:
     volumes:
       - minio-volume:/data
   postgres:
+    container_name: postgres
     image: postgres:alpine
     environment:
       - POSTGRES_USER=${POSTGRES_USER}
@@ -28,6 +23,29 @@ services:
       - "5432:5432"
     volumes:
       - postgres-volume:/var/lib/postgresql/data
+  # server:
+  #   container_name: server
+  #   build: .
+  #   ports:
+  #     - "4000:4000"
+  #   depends_on:
+  #     - postgres
+  #     - minio
+  #   volumes:
+  #     - .:/usr/src/app
+  #   command: air ./cmd/main.go -b 0.0.0.0
+  client:
+    container_name: client
+    build: ./client
+    ports:
+      - "3000:3000"
+    depends_on:
+      # - server
+      - postgres
+      - minio
+    environment:
+      - DATABASE_URL={DATABASE_URL}
+      - NEXT_TELEMETRY_DISABLED=1
 
 volumes:
   minio-volume:
