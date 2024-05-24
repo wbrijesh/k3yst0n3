@@ -1,0 +1,35 @@
+syntax = "proto3";
+
+package auth;
+option go_package = "keystone_auth/rpc";
+
+service AuthService {
+  rpc Login(Credentials) returns (AuthToken);
+  rpc Register(User) returns (AuthToken);
+  rpc VerifyToken(AuthToken) returns (VerifyTokenResponse);
+}
+
+// user's login credentials.
+message Credentials {
+  string username = 1;
+  string password = 2;
+}
+
+// User represents a registered user.
+message User {
+  string id = 1;
+  string username = 2;
+  string email = 3;
+  string password_hash = 4;
+}
+
+// AuthToken represents an access token.
+message AuthToken {
+  string token = 1;
+  int32 expires_in = 2; // seconds
+}
+
+// VerifyTokenResponse indicates whether the token is valid.
+message VerifyTokenResponse {
+  bool valid = 1;
+}
